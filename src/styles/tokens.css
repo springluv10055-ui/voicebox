@@ -1,0 +1,48 @@
+/* design.md frontmatter를 그대로 옮긴 디자인 토큰 */
+:root {
+  /* colors */
+  --color-background: #FFFFFF;
+  --color-on-background: #2B2B2E;
+  --color-surface: #FFFFFF;
+  --color-on-surface: #2B2B2E;
+  --color-surface-variant: #F5F5F7;
+  --color-on-surface-variant: #6B6B70;
+  --color-primary: #00A080;
+  --color-on-primary: #FFFFFF;
+  --color-primary-strong: #00875F;
+  --color-primary-strong-hover: #00714E;
+  --color-primary-container: #E3F5F1;
+  --color-on-primary-container: #00614C;
+  --color-secondary: #A068A8;
+  --color-on-secondary: #FFFFFF;
+  --color-secondary-container: #F5EDF6;
+  --color-on-secondary-container: #6B3F72;
+  --color-outline: #D8D8DC;
+  --color-outline-variant: #EAEAEC;
+  --color-error: #D64545;
+  --color-on-error: #FFFFFF;
+  --color-error-container: #FBE7E7;
+  --color-on-error-container: #8C2F2F;
+
+  /* typography */
+  --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+
+  /* rounded */
+  --rounded-sm: 6px;
+  --rounded-default: 10px;
+  --rounded-md: 14px;
+  --rounded-lg: 20px;
+  --rounded-full: 9999px;
+
+  /* spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 40px;
+
+  /* elevation */
+  --elevation-sm: 0 1px 2px rgba(43, 43, 46, 0.06);
+  --elevation-md: 0 4px 12px rgba(43, 43, 46, 0.08);
+  --elevation-lg: 0 12px 32px rgba(43, 43, 46, 0.12);
+}

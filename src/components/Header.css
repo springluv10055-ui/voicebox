@@ -1,0 +1,20 @@
+.site-header {
+  border-bottom: 1px solid var(--color-outline-variant);
+  padding: 12px 20px;
+}
+
+.site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.site-header__brand img {
+  border-radius: var(--rounded-sm);
+}
+
+.site-header__org-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-on-background);
+}

@@ -1,0 +1,24 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--rounded-full);
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+.status-badge.status-received {
+  background: var(--color-surface-variant);
+  color: var(--color-on-surface-variant);
+}
+
+.status-badge.status-progress {
+  background: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+}
+
+.status-badge.status-done {
+  background: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+}

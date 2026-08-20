@@ -1,0 +1,14 @@
+.home-filters {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 16px 24px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.home-list {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 12px 24px 48px;
+}

@@ -1,0 +1,22 @@
+.status-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.status-filter-bar button {
+  border: 1px solid var(--color-outline);
+  background: var(--color-background);
+  color: var(--color-on-background);
+  border-radius: var(--rounded-full);
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.status-filter-bar button.active {
+  /* 흰 글자가 얹히므로 원색 primary가 아니라 primary-strong을 쓴다 (대비 4.5:1 확보) */
+  background: var(--color-primary-strong);
+  border-color: var(--color-primary-strong);
+  color: var(--color-on-primary);
+}

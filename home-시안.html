@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우리 동네 목소리함 - 홈 화면 시안</title>
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --color-primary:#00A080;
+    --color-on-primary:#FFFFFF;
+    --color-primary-container:#E3F5F1;
+    --color-on-primary-container:#00614C;
+    --color-secondary:#A068A8;
+    --color-on-secondary:#FFFFFF;
+    --color-secondary-container:#F5EDF6;
+    --color-on-secondary-container:#6B3F72;
+    --color-bg:#FFFFFF;
+    --color-surface-variant:#F5F5F7;
+    --color-on-surface-variant:#6B6B70;
+    --color-text:#2B2B2E;
+    --color-outline:#D8D8DC;
+    --color-outline-variant:#EAEAEC;
+    --shadow-sm:0 1px 2px rgba(43,43,46,0.06);
+    --shadow-md:0 4px 12px rgba(43,43,46,0.08);
+    --shadow-lg:0 12px 32px rgba(43,43,46,0.12);
+    --radius-sm:6px;
+    --radius-default:10px;
+    --radius-md:14px;
+    --radius-lg:20px;
+    --radius-full:9999px;
+    --font:'Pretendard', -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--font);
+    color:var(--color-text);
+    background:var(--color-bg);
+    -webkit-font-smoothing:antialiased;
+  }
+  img,svg{display:block;}
+  button{font-family:inherit;cursor:pointer;}
+
+  /* ---------- 시안 선택 바 (실제 화면이 아닌, 이 문서를 살펴보기 위한 도구) ---------- */
+  .picker{
+    position:sticky;top:0;z-index:100;
+    background:#2B2B2E;
+    color:#fff;
+    padding:10px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .picker .picker-label{
+    font-size:12px;
+    color:#B8B8BC;
+    white-space:nowrap;
+  }
+  .picker .tabs{display:flex;gap:6px;}
+  .picker button{
+    border:1px solid #4A4A4E;
+    background:transparent;
+    color:#fff;
+    padding:7px 14px;
+    border-radius:var(--radius-full);
+    font-size:13px;
+    font-weight:600;
+    transition:background .15s ease;
+  }
+  .picker button.active{
+    background:var(--color-primary);
+    border-color:var(--color-primary);
+  }
+  .picker .picker-desc{
+    font-size:12px;
+    color:#B8B8BC;
+    flex-basis:100%;
+  }
+
+  /* ---------- 공통 부품 ---------- */
+  .demo{display:none;}
+  .demo.active{display:block;}
+
+  .site-header{
+    display:flex;align-items:center;gap:10px;
+    border-bottom:1px solid var(--color-outline-variant);
+  }
+  .site-header img{border-radius:var(--radius-sm);}
+  .site-header .org-name{color:var(--color-on-surface-variant);}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;
+    border:none;border-radius:var(--radius-default);
+    font-weight:600;
+    background:var(--color-primary);
+    color:var(--color-on-primary);
+  }
+  .btn-outline{
+    background:transparent;
+    color:var(--color-primary);
+    border:1px solid var(--color-primary);
+  }
+
+  .status-pill{
+    display:inline-flex;align-items:center;
+    border-radius:var(--radius-full);
+    font-weight:500;
+    white-space:nowrap;
+  }
+  .status-접수{background:var(--color-surface-variant);color:var(--color-on-surface-variant);}
+  .status-처리중{background:var(--color-secondary-container);color:var(--color-on-secondary-container);}
+  .status-완료{background:var(--color-primary-container);color:var(--color-on-primary-container);}
+
+  .chip{
+    display:inline-flex;align-items:center;
+    border-radius:var(--radius-full);
+    border:1px solid var(--color-outline);
+    color:var(--color-on-surface-variant);
+    background:#fff;
+    white-space:nowrap;
+  }
+  .chip.active{
+    border-color:var(--color-primary);
+    color:var(--color-on-primary-container);
+    background:var(--color-primary-container);
+  }
+
+  .filter-status{display:flex;flex-wrap:wrap;gap:6px;}
+  .filter-status button{
+    border:1px solid var(--color-outline);
+    background:#fff;
+    color:var(--color-text);
+    border-radius:var(--radius-full);
+    padding:6px 14px;
+    font-size:13px;
+    font-weight:500;
+  }
+  .filter-status button.active{
+    background:var(--color-primary);
+    border-color:var(--color-primary);
+    color:var(--color-on-primary);
+  }
+
+  .chip-row{
+    display:flex;flex-wrap:wrap;gap:8px;
+    /* 분야 개수가 늘어나도 줄바꿈으로 대응 — 레이아웃이 깨지지 않는다 */
+  }
+  .chip-row .chip{padding:6px 12px;font-size:13px;}
+
+  .photo-ph{
+    background:var(--color-surface-variant);
+    border:1px solid var(--color-outline-variant);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--color-outline);
+    flex-shrink:0;
+  }
+  .photo-ph svg{width:34%;height:34%;}
+
+  .site-footer{
+    border-top:1px solid var(--color-outline-variant);
+    color:var(--color-on-surface-variant);
+    font-size:13px;
+    line-height:1.7;
+  }
+
+  /* ================================================================
+     안 1 — 한눈에 보기형 (정보 밀도 높음 / 사진 작게 / 히어로 강한 한 줄)
+     ================================================================ */
+  .demo-1 .site-header{padding:12px 20px;}
+  .demo-1 .site-header img{width:26px;height:26px;}
+  .demo-1 .site-header .org-name{font-size:13px;font-weight:600;}
+
+  .demo-1 .hero{
+    background:var(--color-primary-container);
+    padding:36px 20px 30px;
+    text-align:center;
+  }
+  .demo-1 .hero h1{
+    margin:0 0 8px;
+    font-size:26px;
+    font-weight:700;
+    line-height:1.35;
+    color:var(--color-on-primary-container);
+  }
+  .demo-1 .hero p{
+    margin:0 auto 18px;
+    max-width:420px;
+    font-size:14px;
+    color:var(--color-on-primary-container);
+    opacity:.85;
+  }
+  .demo-1 .hero .btn{padding:12px 28px;font-size:15px;box-shadow:var(--shadow-md);}
+
+  .demo-1 .filters{
+    max-width:1160px;margin:0 auto;
+    padding:14px 20px 6px;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .demo-1 .filter-status button{padding:5px 12px;font-size:12.5px;}
+  .demo-1 .chip-row .chip{padding:5px 10px;font-size:12.5px;}
+
+  .demo-1 .list{
+    max-width:1160px;margin:0 auto;
+    padding:10px 20px 40px;
+    display:grid;grid-template-columns:1fr;gap:8px;
+  }
+  @media(min-width:768px){ .demo-1 .list{grid-template-columns:repeat(2,1fr);} }
+  @media(min-width:1024px){ .demo-1 .list{grid-template-columns:repeat(3,1fr);} }
+
+  .demo-1 .card{
+    display:flex;gap:10px;
+    padding:10px;
+    border:1px solid var(--color-outline-variant);
+    border-radius:var(--radius-sm);
+    background:#fff;
+  }
+  .demo-1 .card .photo-ph{width:52px;height:52px;border-radius:var(--radius-sm);}
+  .demo-1 .card .body{min-width:0;flex:1;}
+  .demo-1 .card .top-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+  .demo-1 .card .status-pill{font-size:10.5px;padding:2px 8px;}
+  .demo-1 .card .cat{font-size:10.5px;color:var(--color-on-surface-variant);}
+  .demo-1 .card h3{margin:0 0 3px;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .demo-1 .card .excerpt{margin:0 0 4px;font-size:12px;color:var(--color-on-surface-variant);
+    display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+  .demo-1 .card .meta{font-size:11px;color:var(--color-on-surface-variant);}
+
+  .demo-1 .site-footer{padding:16px 20px;text-align:center;}
+
+  /* ================================================================
+     안 2 — 느긋하게 보기형 (정보 밀도 낮음 / 사진 크게 / 히어로 차분한 안내)
+     ================================================================ */
+  .demo-2 .site-header{padding:22px 32px;}
+  .demo-2 .site-header img{width:36px;height:36px;}
+  .demo-2 .site-header .org-name{font-size:14px;}
+
+  .demo-2 .hero{
+    padding:56px 32px 48px;
+    max-width:640px;margin:0 auto;
+  }
+  .demo-2 .hero h1{
+    margin:0 0 16px;
+    font-size:28px;
+    font-weight:700;
+    line-height:1.5;
+  }
+  .demo-2 .hero p{
+    margin:0 0 26px;
+    font-size:16px;
+    line-height:1.8;
+    color:var(--color-on-surface-variant);
+  }
+  .demo-2 .hero .btn{padding:14px 26px;font-size:15px;}
+
+  .demo-2 .filters{
+    max-width:1200px;margin:0 auto;
+    padding:8px 32px 12px;
+    display:flex;flex-direction:column;gap:14px;
+  }
+  .demo-2 .filter-status button{padding:8px 18px;font-size:14px;}
+  .demo-2 .chip-row .chip{padding:8px 16px;font-size:14px;}
+
+  .demo-2 .list{
+    max-width:1200px;margin:0 auto;
+    padding:20px 32px 64px;
+    display:grid;grid-template-columns:1fr;gap:32px;
+  }
+  @media(min-width:768px){ .demo-2 .list{grid-template-columns:repeat(2,1fr);} }
+  @media(min-width:1024px){ .demo-2 .list{grid-template-columns:repeat(3,1fr);} }
+
+  .demo-2 .card{
+    border:1px solid var(--color-outline-variant);
+    border-radius:var(--radius-md);
+    overflow:hidden;
+    background:#fff;
+    box-shadow:var(--shadow-sm);
+    transition:box-shadow .15s ease;
+  }
+  .demo-2 .card:hover{box-shadow:var(--shadow-md);}
+  .demo-2 .card .photo-ph{width:100%;aspect-ratio:4/3;}
+  .demo-2 .card .photo-ph svg{width:22%;height:22%;}
+  .demo-2 .card .body{padding:22px;}
+  .demo-2 .card .top-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .demo-2 .card .status-pill{font-size:12px;padding:4px 12px;}
+  .demo-2 .card .cat{font-size:12px;color:var(--color-on-surface-variant);}
+  .demo-2 .card h3{margin:0 0 10px;font-size:19px;font-weight:600;line-height:1.4;}
+  .demo-2 .card .excerpt{margin:0 0 16px;font-size:15px;line-height:1.7;color:var(--color-on-surface-variant);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .demo-2 .card .meta{font-size:13px;color:var(--color-on-surface-variant);}
+
+  .demo-2 .site-footer{padding:32px;text-align:center;}
+
+  /* ================================================================
+     안 3 — 균형형 (정보 밀도 중간 / 사진 중간 / 히어로 담백한 안내)
+     ================================================================ */
+  .demo-3 .site-header{padding:16px 24px;}
+  .demo-3 .site-header img{width:30px;height:30px;}
+  .demo-3 .site-header .org-name{font-size:13px;}
+
+  .demo-3 .hero{
+    background:var(--color-secondary-container);
+    padding:38px 24px;
+  }
+  .demo-3 .hero-inner{max-width:1160px;margin:0 auto;}
+  .demo-3 .hero h1{
+    margin:0 0 6px;
+    font-size:23px;
+    font-weight:700;
+    color:var(--color-on-secondary-container);
+  }
+  .demo-3 .hero p{
+    margin:0 0 16px;
+    font-size:14.5px;
+    color:var(--color-on-secondary-container);
+    opacity:.9;
+  }
+  .demo-3 .hero .btn{padding:11px 22px;font-size:14px;}
+
+  .demo-3 .filters{
+    max-width:1160px;margin:0 auto;
+    padding:16px 24px 8px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .demo-3 .filter-status button{padding:6px 14px;font-size:13px;}
+  .demo-3 .chip-row .chip{padding:6px 13px;font-size:13px;}
+
+  .demo-3 .list{
+    max-width:1160px;margin:0 auto;
+    padding:12px 24px 48px;
+    display:grid;grid-template-columns:1fr;gap:16px;
+  }
+  @media(min-width:768px){ .demo-3 .list{grid-template-columns:repeat(2,1fr);} }
+  @media(min-width:1024px){ .demo-3 .list{grid-template-columns:repeat(3,1fr);} }
+
+  .demo-3 .card{
+    display:flex;gap:14px;
+    padding:14px;
+    border:1px solid var(--color-outline-variant);
+    border-radius:var(--radius-md);
+    background:#fff;
+    box-shadow:var(--shadow-sm);
+  }
+  .demo-3 .card .photo-ph{width:88px;height:88px;border-radius:var(--radius-sm);}
+  .demo-3 .card .body{min-width:0;flex:1;}
+  .demo-3 .card .top-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+  .demo-3 .card .status-pill{font-size:11.5px;padding:3px 10px;}
+  .demo-3 .card .cat{font-size:11.5px;color:var(--color-on-surface-variant);}
+  .demo-3 .card h3{margin:0 0 5px;font-size:15.5px;font-weight:600;}
+  .demo-3 .card .excerpt{margin:0 0 8px;font-size:13px;line-height:1.6;color:var(--color-on-surface-variant);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .demo-3 .card .meta{font-size:12px;color:var(--color-on-surface-variant);}
+
+  .demo-3 .site-footer{padding:22px 24px;text-align:center;}
+
+  /* ================================================================
+     안 4 — 선택 조합안 (헤더·히어로: 안 1 그대로 / 필터·목록: 안 3 그대로)
+     ================================================================ */
+  .demo-4 .site-header{padding:12px 20px;}
+  .demo-4 .site-header img{width:26px;height:26px;}
+  .demo-4 .site-header .org-name{font-size:13px;font-weight:600;}
+
+  .demo-4 .hero{
+    background:var(--color-primary-container);
+    padding:36px 20px 30px;
+    text-align:center;
+  }
+  .demo-4 .hero h1{
+    margin:0 0 8px;
+    font-size:26px;
+    font-weight:700;
+    line-height:1.35;
+    color:var(--color-on-primary-container);
+  }
+  .demo-4 .hero p{
+    margin:0 auto 18px;
+    max-width:420px;
+    font-size:14px;
+    color:var(--color-on-primary-container);
+    opacity:.85;
+  }
+  .demo-4 .hero .btn{padding:12px 28px;font-size:15px;box-shadow:var(--shadow-md);}
+
+  .demo-4 .filters{
+    max-width:1160px;margin:0 auto;
+    padding:16px 24px 8px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .demo-4 .filter-status button{padding:6px 14px;font-size:13px;}
+  .demo-4 .chip-row .chip{padding:6px 13px;font-size:13px;}
+
+  .demo-4 .list{
+    max-width:1160px;margin:0 auto;
+    padding:12px 24px 48px;
+    display:grid;grid-template-columns:1fr;gap:16px;
+  }
+  @media(min-width:768px){ .demo-4 .list{grid-template-columns:repeat(2,1fr);} }
+  @media(min-width:1024px){ .demo-4 .list{grid-template-columns:repeat(3,1fr);} }
+
+  .demo-4 .card{
+    display:flex;gap:14px;
+    padding:14px;
+    border:1px solid var(--color-outline-variant);
+    border-radius:var(--radius-md);
+    background:#fff;
+    box-shadow:var(--shadow-sm);
+  }
+  .demo-4 .card .photo-ph{width:88px;height:88px;border-radius:var(--radius-sm);}
+  .demo-4 .card .body{min-width:0;flex:1;}
+  .demo-4 .card .top-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+  .demo-4 .card .status-pill{font-size:11.5px;padding:3px 10px;}
+  .demo-4 .card .cat{font-size:11.5px;color:var(--color-on-surface-variant);}
+  .demo-4 .card h3{margin:0 0 5px;font-size:15.5px;font-weight:600;}
+  .demo-4 .card .excerpt{margin:0 0 8px;font-size:13px;line-height:1.6;color:var(--color-on-surface-variant);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .demo-4 .card .meta{font-size:12px;color:var(--color-on-surface-variant);}
+
+  .demo-4 .site-footer{padding:22px 24px;text-align:center;}
+</style>
+</head>
+<body>
+
+  <div class="picker">
+    <span class="picker-label">홈 화면 시안</span>
+    <div class="tabs">
+      <button type="button" class="active" data-target="demo-4">최종 조합안</button>
+      <button type="button" data-target="demo-1">안 1 · 한눈에 보기형</button>
+      <button type="button" data-target="demo-2">안 2 · 느긋하게 보기형</button>
+      <button type="button" data-target="demo-3">안 3 · 균형형</button>
+    </div>
+    <span class="picker-desc">최종 조합안 = 헤더·히어로는 안 1, 필터·의견 목록은 안 3. 뒤 3개는 비교용으로 남겨둔 안입니다. 이 회색 바는 실제 화면이 아닙니다.</span>
+  </div>
+
+  <!-- ================= 최종 조합안 (헤더·히어로: 안1 / 필터·목록: 안3) ================= -->
+  <section class="demo demo-4 active" id="demo-4">
+    <header class="site-header">
+      <img src="icons/icon-192.png" alt="위스테이별내사회적협동조합 아이콘">
+      <span class="org-name">위스테이별내사회적협동조합</span>
+    </header>
+
+    <section class="hero">
+      <h1>우리 동네 목소리함</h1>
+      <p>생활 속 불편이나 제안을 남기면, 접수부터 완료까지 진행 상황을 알려드립니다.</p>
+      <button type="button" class="btn">의견 남기기</button>
+    </section>
+
+    <section class="filters">
+      <div class="filter-status">
+        <button type="button" class="active">전체</button>
+        <button type="button">접수</button>
+        <button type="button">처리중</button>
+        <button type="button">완료</button>
+      </div>
+      <div class="chip-row">
+        <span class="chip active">전체</span>
+        <span class="chip">안전·조명</span>
+        <span class="chip">놀이터</span>
+        <span class="chip">주차</span>
+        <span class="chip">조경</span>
+        <span class="chip">시설관리</span>
+        <span class="chip">소음</span>
+        <span class="chip">기타</span>
+      </div>
+    </section>
+
+    <section class="list">
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-접수">접수</span><span class="cat">안전·조명</span></div>
+          <h3>정문 앞 가로등이 며칠째 안 켜져요</h3>
+          <p class="excerpt">저녁에 정문 쪽으로 걸어오는데 가로등이 꺼져 있어서 좀 무서웠어요. 벌써 며칠째 그대로예요.</p>
+          <p class="meta">이OO · 2026.08.18</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-처리중">처리중</span><span class="cat">놀이터</span></div>
+          <h3>놀이터 그네가 삐걱거려요</h3>
+          <p class="excerpt">아이가 그네를 탈 때마다 삐걱거리는 소리가 심하게 나요. 점검이 필요할 것 같습니다.</p>
+          <p class="meta">박OO · 2026.08.14</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-접수">접수</span><span class="cat">주차</span></div>
+          <h3>지하주차장 2구역이 너무 어두워요</h3>
+          <p class="excerpt">밤에 주차하고 내릴 때 조명이 부족해서 발밑이 잘 안 보여요.</p>
+          <p class="meta">최OO · 2026.08.12</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-완료">완료</span><span class="cat">조경</span></div>
+          <h3>화단에 잡초가 많이 자랐어요</h3>
+          <p class="excerpt">단지 중앙 화단에 잡초가 많이 올라와서 보기에도 안 좋고 관리가 필요해 보여요.</p>
+          <p class="meta">김OO · 2026.08.05</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-처리중">처리중</span><span class="cat">시설관리</span></div>
+          <h3>커뮤니티실 에어컨 소리가 너무 커요</h3>
+          <p class="excerpt">커뮤니티실에서 모임을 하는데 에어컨 소음이 심해서 대화가 어려울 정도예요.</p>
+          <p class="meta">정OO · 2026.08.02</p>
+        </div>
+      </article>
+    </section>
+
+    <footer class="site-footer">© 위스테이별내사회적협동조합 · 국내 최초 협동조합형 공동체 아파트</footer>
+  </section>
+
+  <!-- ================= 안 1 ================= -->
+  <section class="demo demo-1" id="demo-1">
+    <header class="site-header">
+      <img src="icons/icon-192.png" alt="위스테이별내사회적협동조합 아이콘">
+      <span class="org-name">위스테이별내사회적협동조합</span>
+    </header>
+
+    <section class="hero">
+      <h1>우리 동네 목소리함</h1>
+      <p>생활 속 불편이나 제안을 남기면, 접수부터 완료까지 진행 상황을 알려드립니다.</p>
+      <button type="button" class="btn">의견 남기기</button>
+    </section>
+
+    <section class="filters">
+      <div class="filter-status">
+        <button type="button" class="active">전체</button>
+        <button type="button">접수</button>
+        <button type="button">처리중</button>
+        <button type="button">완료</button>
+      </div>
+      <div class="chip-row">
+        <span class="chip active">전체</span>
+        <span class="chip">안전·조명</span>
+        <span class="chip">놀이터</span>
+        <span class="chip">주차</span>
+        <span class="chip">조경</span>
+        <span class="chip">시설관리</span>
+        <span class="chip">소음</span>
+        <span class="chip">기타</span>
+      </div>
+    </section>
+
+    <section class="list">
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-접수">접수</span><span class="cat">안전·조명</span></div>
+          <h3>정문 앞 가로등이 며칠째 안 켜져요</h3>
+          <p class="excerpt">저녁에 정문 쪽으로 걸어오는데 가로등이 꺼져 있어서 좀 무서웠어요. 벌써...</p>
+          <p class="meta">이OO · 2026.08.18</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-처리중">처리중</span><span class="cat">놀이터</span></div>
+          <h3>놀이터 그네가 삐걱거려요</h3>
+          <p class="excerpt">아이가 그네를 탈 때마다 삐걱거리는 소리가 심하게 나요...</p>
+          <p class="meta">박OO · 2026.08.14</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-접수">접수</span><span class="cat">주차</span></div>
+          <h3>지하주차장 2구역이 너무 어두워요</h3>
+          <p class="excerpt">밤에 주차하고 내릴 때 조명이 부족해서 발밑이 잘 안 보여요...</p>
+          <p class="meta">최OO · 2026.08.12</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-완료">완료</span><span class="cat">조경</span></div>
+          <h3>화단에 잡초가 많이 자랐어요</h3>
+          <p class="excerpt">단지 중앙 화단에 잡초가 많이 올라와서 보기에도 안 좋고...</p>
+          <p class="meta">김OO · 2026.08.05</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-처리중">처리중</span><span class="cat">시설관리</span></div>
+          <h3>커뮤니티실 에어컨 소리가 너무 커요</h3>
+          <p class="excerpt">커뮤니티실에서 모임을 하는데 에어컨 소음이 심해서...</p>
+          <p class="meta">정OO · 2026.08.02</p>
+        </div>
+      </article>
+    </section>
+
+    <footer class="site-footer">© 위스테이별내사회적협동조합 · 국내 최초 협동조합형 공동체 아파트</footer>
+  </section>
+
+  <!-- ================= 안 2 ================= -->
+  <section class="demo demo-2" id="demo-2">
+    <header class="site-header">
+      <img src="icons/icon-192.png" alt="위스테이별내사회적협동조합 아이콘">
+      <span class="org-name">위스테이별내사회적협동조합</span>
+    </header>
+
+    <section class="hero">
+      <h1>우리 동네 목소리함</h1>
+      <p>골목 가로등이 안 켜진다든지, 놀이터 그네가 삐걱거린다든지 — 살면서 겪는 불편이나 제안을 편하게 남겨주세요. 저희가 모아서 확인하고, 어떻게 처리했는지 다시 알려드립니다.</p>
+      <button type="button" class="btn btn-outline">의견 남기기</button>
+    </section>
+
+    <section class="filters">
+      <div class="filter-status">
+        <button type="button" class="active">전체</button>
+        <button type="button">접수</button>
+        <button type="button">처리중</button>
+        <button type="button">완료</button>
+      </div>
+      <div class="chip-row">
+        <span class="chip active">전체</span>
+        <span class="chip">안전·조명</span>
+        <span class="chip">놀이터</span>
+        <span class="chip">주차</span>
+        <span class="chip">조경</span>
+        <span class="chip">시설관리</span>
+        <span class="chip">소음</span>
+        <span class="chip">기타</span>
+      </div>
+    </section>
+
+    <section class="list">
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-접수">접수</span><span class="cat">안전·조명</span></div>
+          <h3>정문 앞 가로등이 며칠째 안 켜져요</h3>
+          <p class="excerpt">저녁에 정문 쪽으로 걸어오는데 가로등이 꺼져 있어서 좀 무서웠어요. 벌써 며칠째 그대로예요.</p>
+          <p class="meta">이OO · 2026.08.18</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-처리중">처리중</span><span class="cat">놀이터</span></div>
+          <h3>놀이터 그네가 삐걱거려요</h3>
+          <p class="excerpt">아이가 그네를 탈 때마다 삐걱거리는 소리가 심하게 나요. 안전한지 점검이 필요할 것 같습니다.</p>
+          <p class="meta">박OO · 2026.08.14</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-접수">접수</span><span class="cat">주차</span></div>
+          <h3>지하주차장 2구역이 너무 어두워요</h3>
+          <p class="excerpt">밤에 주차하고 내릴 때 조명이 부족해서 발밑이 잘 안 보여요. 조도 개선 부탁드립니다.</p>
+          <p class="meta">최OO · 2026.08.12</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-완료">완료</span><span class="cat">조경</span></div>
+          <h3>화단에 잡초가 많이 자랐어요</h3>
+          <p class="excerpt">단지 중앙 화단에 잡초가 많이 올라와서 보기에도 안 좋고 관리가 필요해 보여요.</p>
+          <p class="meta">김OO · 2026.08.05</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-처리중">처리중</span><span class="cat">시설관리</span></div>
+          <h3>커뮤니티실 에어컨 소리가 너무 커요</h3>
+          <p class="excerpt">커뮤니티실에서 모임을 하는데 에어컨 소음이 심해서 대화가 어려울 정도예요.</p>
+          <p class="meta">정OO · 2026.08.02</p>
+        </div>
+      </article>
+    </section>
+
+    <footer class="site-footer">© 위스테이별내사회적협동조합 · 국내 최초 협동조합형 공동체 아파트</footer>
+  </section>
+
+  <!-- ================= 안 3 ================= -->
+  <section class="demo demo-3" id="demo-3">
+    <header class="site-header">
+      <img src="icons/icon-192.png" alt="위스테이별내사회적협동조합 아이콘">
+      <span class="org-name">위스테이별내사회적협동조합</span>
+    </header>
+
+    <section class="hero">
+      <div class="hero-inner">
+        <h1>우리 동네 목소리함</h1>
+        <p>생활 속 불편이나 제안을 남기면 접수 → 처리중 → 완료로 진행 상황을 확인할 수 있어요.</p>
+        <button type="button" class="btn">의견 남기기</button>
+      </div>
+    </section>
+
+    <section class="filters">
+      <div class="filter-status">
+        <button type="button" class="active">전체</button>
+        <button type="button">접수</button>
+        <button type="button">처리중</button>
+        <button type="button">완료</button>
+      </div>
+      <div class="chip-row">
+        <span class="chip active">전체</span>
+        <span class="chip">안전·조명</span>
+        <span class="chip">놀이터</span>
+        <span class="chip">주차</span>
+        <span class="chip">조경</span>
+        <span class="chip">시설관리</span>
+        <span class="chip">소음</span>
+        <span class="chip">기타</span>
+      </div>
+    </section>
+
+    <section class="list">
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-접수">접수</span><span class="cat">안전·조명</span></div>
+          <h3>정문 앞 가로등이 며칠째 안 켜져요</h3>
+          <p class="excerpt">저녁에 정문 쪽으로 걸어오는데 가로등이 꺼져 있어서 좀 무서웠어요. 벌써 며칠째 그대로예요.</p>
+          <p class="meta">이OO · 2026.08.18</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-처리중">처리중</span><span class="cat">놀이터</span></div>
+          <h3>놀이터 그네가 삐걱거려요</h3>
+          <p class="excerpt">아이가 그네를 탈 때마다 삐걱거리는 소리가 심하게 나요. 점검이 필요할 것 같습니다.</p>
+          <p class="meta">박OO · 2026.08.14</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-접수">접수</span><span class="cat">주차</span></div>
+          <h3>지하주차장 2구역이 너무 어두워요</h3>
+          <p class="excerpt">밤에 주차하고 내릴 때 조명이 부족해서 발밑이 잘 안 보여요.</p>
+          <p class="meta">최OO · 2026.08.12</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-완료">완료</span><span class="cat">조경</span></div>
+          <h3>화단에 잡초가 많이 자랐어요</h3>
+          <p class="excerpt">단지 중앙 화단에 잡초가 많이 올라와서 보기에도 안 좋고 관리가 필요해 보여요.</p>
+          <p class="meta">김OO · 2026.08.05</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="photo-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>
+        <div class="body">
+          <div class="top-row"><span class="status-pill status-처리중">처리중</span><span class="cat">시설관리</span></div>
+          <h3>커뮤니티실 에어컨 소리가 너무 커요</h3>
+          <p class="excerpt">커뮤니티실에서 모임을 하는데 에어컨 소음이 심해서 대화가 어려울 정도예요.</p>
+          <p class="meta">정OO · 2026.08.02</p>
+        </div>
+      </article>
+    </section>
+
+    <footer class="site-footer">© 위스테이별내사회적협동조합 · 국내 최초 협동조합형 공동체 아파트</footer>
+  </section>
+
+<script>
+  document.querySelectorAll('.picker .tabs button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.picker .tabs button').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.demo').forEach(function(d){ d.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.target).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

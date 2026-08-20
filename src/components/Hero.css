@@ -1,0 +1,27 @@
+.hero {
+  background: var(--color-primary-container);
+  padding: 36px 20px 30px;
+  text-align: center;
+}
+
+.hero__title {
+  margin: 0 0 8px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--color-on-primary-container);
+}
+
+.hero__body {
+  margin: 0 auto 18px;
+  max-width: 420px;
+  font-size: 14px;
+  color: var(--color-on-primary-container);
+  opacity: 0.85;
+}
+
+.hero__cta {
+  padding: 12px 28px;
+  font-size: 15px;
+  box-shadow: var(--elevation-md);
+}
