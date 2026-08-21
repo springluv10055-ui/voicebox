@@ -1,7 +1,7 @@
 import { supabase } from './supabaseClient'
 
 const SELECT_COLUMNS = 'id, title, content, author, photo_url, status, category, created_at'
-const PHOTO_BUCKET = 'post-photos'
+const PHOTO_BUCKET = 'photos'
 
 // 첨부 사진을 Storage에 올리고 공개 URL을 돌려준다.
 export async function uploadPostPhoto(file) {
