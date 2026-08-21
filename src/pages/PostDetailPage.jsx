@@ -1,12 +1,57 @@
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import StatusBadge from '../components/StatusBadge'
 import PhotoPlaceholderIcon from '../components/PhotoPlaceholderIcon'
-import { POSTS } from '../data/posts'
+import { formatDate } from '../lib/format'
+import { fetchPostById } from '../lib/postsApi'
 import './PostDetailPage.css'
 
 export default function PostDetailPage() {
   const { id } = useParams()
-  const post = POSTS.find((p) => String(p.id) === id)
+  const [post, setPost] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function load() {
+      setLoading(true)
+      setErrorMessage('')
+      try {
+        const data = await fetchPostById(id)
+        if (!cancelled) setPost(data)
+      } catch (err) {
+        if (!cancelled) setErrorMessage('의견을 불러오지 못했어요. 잠시 후 다시 시도해주세요.')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [id])
+
+  if (loading) {
+    return (
+      <main className="post-detail post-detail--empty">
+        <p>불러오는 중...</p>
+      </main>
+    )
+  }
+
+  if (errorMessage) {
+    return (
+      <main className="post-detail post-detail--empty">
+        <p>{errorMessage}</p>
+        <Link to="/" className="btn btn-outline">
+          목록으로
+        </Link>
+      </main>
+    )
+  }
 
   if (!post) {
     return (
@@ -26,7 +71,11 @@ export default function PostDetailPage() {
       </Link>
 
       <div className="post-detail__photo">
-        <PhotoPlaceholderIcon size="60px" />
+        {post.photo_url ? (
+          <img src={post.photo_url} alt="" />
+        ) : (
+          <PhotoPlaceholderIcon size="60px" />
+        )}
       </div>
 
       <div className="post-detail__top-row">
@@ -36,7 +85,7 @@ export default function PostDetailPage() {
 
       <h2 className="post-detail__title">{post.title}</h2>
       <p className="post-detail__meta">
-        {post.author} · {post.createdAt}
+        {post.author} · {formatDate(post.created_at)}
       </p>
 
       <p className="post-detail__content">{post.content}</p>

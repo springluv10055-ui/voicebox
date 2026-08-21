@@ -2,10 +2,14 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PhotoPlaceholderIcon from '../components/PhotoPlaceholderIcon'
 import { CATEGORIES } from '../data/posts'
+import { createPost, uploadPostPhoto } from '../lib/postsApi'
 import './WritePage.css'
 
-// 지금은 저장(백엔드) 연동 전이라 제출해도 실제로 저장되지 않는다.
-// 화면과 폼 검증만 확인하는 단계.
+// 로그인 기능이 아직 없어서 작성자 이름을 직접 입력받지 않고 임시값을 쓴다.
+// (design.md 규칙: 작성자는 사용자가 직접 입력하는 필드로 만들지 않는다)
+// 로그인이 붙으면 이 값을 실제 사용자 이름으로 바꾸면 된다.
+const TEMP_AUTHOR_NAME = '익명'
+
 export default function WritePage() {
   const navigate = useNavigate()
   const [category, setCategory] = useState(CATEGORIES[0])
@@ -15,6 +19,8 @@ export default function WritePage() {
   const [photoUrl, setPhotoUrl] = useState(null)
   const [titleError, setTitleError] = useState('')
   const [contentError, setContentError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   useEffect(() => {
     if (!photoFile) {
@@ -35,18 +41,37 @@ export default function WritePage() {
     setPhotoFile(null)
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
 
     const nextTitleError = title.trim() ? '' : '제목을 입력해주세요'
     const nextContentError = content.trim() ? '' : '내용을 입력해주세요'
     setTitleError(nextTitleError)
     setContentError(nextContentError)
+    setSubmitError('')
 
     if (nextTitleError || nextContentError) return
 
-    // 저장은 다음 단계에서 연동한다. 지금은 화면 확인용.
-    window.alert('아직 저장 기능은 연결되지 않았어요. 화면만 확인하는 단계예요.')
+    setSubmitting(true)
+    try {
+      let uploadedPhotoUrl = null
+      if (photoFile) {
+        uploadedPhotoUrl = await uploadPostPhoto(photoFile)
+      }
+
+      const post = await createPost({
+        title: title.trim(),
+        content: content.trim(),
+        author: TEMP_AUTHOR_NAME,
+        category,
+        photoUrl: uploadedPhotoUrl,
+      })
+
+      navigate(`/posts/${post.id}`)
+    } catch (err) {
+      setSubmitError('등록에 실패했어요. 잠시 후 다시 시도해주세요.')
+      setSubmitting(false)
+    }
   }
 
   const now = new Date()
@@ -133,8 +158,10 @@ export default function WritePage() {
           로그인한 사용자 이름과 등록 시각({nowLabel})이 자동으로 채워져요.
         </p>
 
-        <button type="submit" className="btn btn-primary write-form__submit">
-          등록하기
+        {submitError && <p className="write-form__error">{submitError}</p>}
+
+        <button type="submit" className="btn btn-primary write-form__submit" disabled={submitting}>
+          {submitting ? '등록하는 중...' : '등록하기'}
         </button>
       </form>
     </main>

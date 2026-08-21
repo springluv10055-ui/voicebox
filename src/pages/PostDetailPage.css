@@ -37,6 +37,13 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.post-detail__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .post-detail__top-row {

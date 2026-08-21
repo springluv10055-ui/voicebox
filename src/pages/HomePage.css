@@ -12,3 +12,14 @@
   margin: 0 auto;
   padding: 12px 24px 48px;
 }
+
+.home-list__status {
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.home-list__status--error {
+  color: var(--color-error);
+}
