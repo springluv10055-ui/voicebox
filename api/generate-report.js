@@ -23,7 +23,9 @@ export default async function handler(req, res) {
     return
   }
 
+  console.log('generate-report received body:', JSON.stringify(req.body))
   const draft = typeof req.body?.draft === 'string' ? req.body.draft.trim() : ''
+  console.log('generate-report parsed draft:', draft)
   if (!draft) {
     res.status(400).json({ error: '내용을 먼저 입력해주세요.' })
     return
