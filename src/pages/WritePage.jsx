@@ -3,11 +3,14 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import PhotoPlaceholderIcon from '../components/PhotoPlaceholderIcon'
 import { CATEGORIES } from '../data/posts'
 import { createPost, uploadPostPhoto } from '../lib/postsApi'
+import { generateReportDraft } from '../lib/aiAssist'
 import { useAuth } from '../contexts/AuthContext'
+import { useToast } from '../contexts/ToastContext'
 import './WritePage.css'
 
 export default function WritePage() {
   const { user, loading: authLoading } = useAuth()
+  const { showToast } = useToast()
   const navigate = useNavigate()
   const [category, setCategory] = useState(CATEGORIES[0])
   const [title, setTitle] = useState('')
@@ -18,6 +21,8 @@ export default function WritePage() {
   const [contentError, setContentError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState('')
 
   useEffect(() => {
     if (!photoFile) {
@@ -40,6 +45,31 @@ export default function WritePage() {
 
   function handleRemovePhoto() {
     setPhotoFile(null)
+  }
+
+  async function handleAiAssist() {
+    if (!content.trim()) {
+      setAiError('AI가 다듬을 내용을 먼저 짧게라도 적어주세요.')
+      return
+    }
+
+    setAiError('')
+    setAiLoading(true)
+    try {
+      const draft = await generateReportDraft(content.trim())
+      setTitle(draft.title)
+      setContent(draft.content)
+      if (CATEGORIES.includes(draft.category)) {
+        setCategory(draft.category)
+      }
+      setTitleError('')
+      setContentError('')
+      showToast('AI가 초안을 작성했어요. 내용을 확인하고 등록해주세요.')
+    } catch (err) {
+      setAiError(err.message || 'AI 초안 작성에 실패했어요. 잠시 후 다시 시도해주세요.')
+    } finally {
+      setAiLoading(false)
+    }
   }
 
   async function handleSubmit(e) {
@@ -121,17 +151,28 @@ export default function WritePage() {
         </div>
 
         <div className="write-form__field">
-          <label className="write-form__label" htmlFor="post-content">
-            내용
-          </label>
+          <div className="write-form__label-row">
+            <label className="write-form__label" htmlFor="post-content">
+              내용
+            </label>
+            <button
+              type="button"
+              className="ai-assist-btn"
+              onClick={handleAiAssist}
+              disabled={aiLoading}
+            >
+              {aiLoading ? '작성 중...' : '✨ AI 작성도우미'}
+            </button>
+          </div>
           <textarea
             id="post-content"
             className={contentError ? 'input-textarea input-text--error' : 'input-textarea'}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="언제, 어디서, 무슨 일이 있었는지 적어주세요."
+            placeholder="짧게 메모하듯 적고 'AI 작성도우미'를 눌러도 되고, 직접 다 적어도 돼요."
           />
           {contentError && <p className="write-form__error">{contentError}</p>}
+          {aiError && <p className="write-form__error">{aiError}</p>}
         </div>
 
         <div className="write-form__field">
