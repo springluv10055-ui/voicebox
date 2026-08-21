@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import PhotoPlaceholderIcon from '../components/PhotoPlaceholderIcon'
 import { CATEGORIES } from '../data/posts'
 import { createPost, uploadPostPhoto } from '../lib/postsApi'
+import { useAuth } from '../contexts/AuthContext'
 import './WritePage.css'
 
-// 로그인 기능이 아직 없어서 작성자 이름을 직접 입력받지 않고 임시값을 쓴다.
-// (design.md 규칙: 작성자는 사용자가 직접 입력하는 필드로 만들지 않는다)
-// 로그인이 붙으면 이 값을 실제 사용자 이름으로 바꾸면 된다.
-const TEMP_AUTHOR_NAME = '익명'
-
 export default function WritePage() {
+  const { user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const [category, setCategory] = useState(CATEGORIES[0])
   const [title, setTitle] = useState('')
@@ -31,6 +28,10 @@ export default function WritePage() {
     setPhotoUrl(url)
     return () => URL.revokeObjectURL(url)
   }, [photoFile])
+
+  if (!authLoading && !user) {
+    return <Navigate to="/login" replace />
+  }
 
   function handlePhotoChange(e) {
     const file = e.target.files?.[0]
@@ -59,12 +60,16 @@ export default function WritePage() {
         uploadedPhotoUrl = await uploadPostPhoto(photoFile)
       }
 
+      const authorName =
+        user.user_metadata?.full_name || user.user_metadata?.name || user.email || '익명'
+
       const post = await createPost({
         title: title.trim(),
         content: content.trim(),
-        author: TEMP_AUTHOR_NAME,
+        author: authorName,
         category,
         photoUrl: uploadedPhotoUrl,
+        userId: user.id,
       })
 
       navigate(`/posts/${post.id}`)

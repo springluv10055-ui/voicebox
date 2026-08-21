@@ -1,0 +1,45 @@
+.mypage {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 24px 24px 56px;
+}
+
+.mypage__status {
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.mypage__status--error {
+  color: var(--color-error);
+}
+
+.mypage__info {
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mypage__info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mypage__info-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-on-surface-variant);
+}
+
+.mypage__info-value {
+  font-size: 16px;
+  color: var(--color-on-background);
+}
+
+.mypage__signout {
+  margin-top: 8px;
+  align-self: flex-start;
+}

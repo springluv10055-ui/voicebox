@@ -1,20 +1,77 @@
 .site-header {
   border-bottom: 1px solid var(--color-outline-variant);
   padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .site-header__brand {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .site-header__brand img {
   border-radius: var(--rounded-sm);
+  flex-shrink: 0;
 }
 
 .site-header__org-name {
   font-size: 13px;
   font-weight: 600;
   color: var(--color-on-background);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.site-header__auth {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.site-header__auth-btn {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--rounded-full);
+  border: 1px solid var(--color-outline);
+  color: var(--color-on-background);
+  white-space: nowrap;
+}
+
+.site-header__auth-btn--primary {
+  background: var(--color-primary-strong);
+  border-color: var(--color-primary-strong);
+  color: var(--color-on-primary);
+}
+
+.site-header__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--rounded-full);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary-container);
+  flex-shrink: 0;
+}
+
+.site-header__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.site-header__avatar-fallback {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-on-primary-container);
+  text-transform: uppercase;
 }

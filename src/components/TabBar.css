@@ -1,0 +1,23 @@
+.tab-bar {
+  display: flex;
+  gap: 24px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--color-outline-variant);
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.tab-item {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 14px 4px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+}
+
+.tab-item--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
